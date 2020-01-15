@@ -1,0 +1,28 @@
+{
+  "name": "@outercorner/secrets-remote",
+  "version": "0.0.1",
+  "description": "A command line utility to remotely request secrets such as passwords, credit card numbers, one-time tokens, etc from Secrets.app",
+  "main": "index.js",
+  "scripts": {
+    "cli": "node bin/cli.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "secrets": "bin/cli.js",
+    "secrets-device": "bin/cli-device.js"
+  },
+  "keywords": [
+    "secrets",
+    "password",
+    "login",
+    "outercorner",
+    "authentication",
+    "otp",
+    "remote"
+  ],
+  "author": "Outer Corner (https://outercorner.com)",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^4.1.0"
+  }
+}
