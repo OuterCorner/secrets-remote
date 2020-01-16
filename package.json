@@ -2,7 +2,7 @@
   "name": "@outercorner/secrets-remote",
   "version": "0.0.1",
   "description": "A command line utility to remotely request secrets such as passwords, credit card numbers, one-time tokens, etc from Secrets.app",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "cli": "node bin/cli.js",
     "test": "echo \"Error: no test specified\" && exit 1"

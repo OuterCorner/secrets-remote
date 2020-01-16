@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { pairDevice } = require('../lib')
 
 const program = require('commander');
 
@@ -22,8 +23,6 @@ program
 program
     .command('pair')
     .description("pair a new device")
-    .action( function() {
-        console.log("pair")
-    })
+    .action( pairDevice )
 
 program.parse(process.argv)
