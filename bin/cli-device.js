@@ -25,19 +25,22 @@ program
 // pair command
 program
     .command('pair')
+    .option('-Q, --large-qrcode', 'use a large QR Code', false)
     .description("pair a new device")
-    .action( pair )
+    .action( function(cmdObj) {
+        pair(!cmdObj.largeQrcode)
+    })
 
-clear()
 program.parse(process.argv)
 
 
-async function pair() {
+
+async function pair(smallQR) {
     try {
-        
         const device = await pairDevice((pairingInfo) => {
             const pairingUrl = pairingInfo.url
-            qrcode.generate(pairingUrl, {small: true});
+            // clear()
+            qrcode.generate(pairingUrl, {small: smallQR});
         })
     
     } catch(e) {
