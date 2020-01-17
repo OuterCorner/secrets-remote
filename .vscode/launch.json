@@ -11,8 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/bin/cli.js",
-            "args": ["device", "pair"]
+            "program": "${workspaceFolder}/bin/cli-device.js",
+            "args": ["pair"]
         }
     ]
 }

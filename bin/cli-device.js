@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 const { pairDevice } = require('../lib')
+const clear = require('clear');
+const chalk = require('chalk');
+const qrcode = require('qrcode-terminal');
 
 const program = require('commander');
 
@@ -23,6 +26,23 @@ program
 program
     .command('pair')
     .description("pair a new device")
-    .action( pairDevice )
+    .action( pair )
 
+clear()
 program.parse(process.argv)
+
+
+async function pair() {
+    try {
+        
+        const device = await pairDevice((pairingInfo) => {
+            const pairingUrl = pairingInfo.url
+            qrcode.generate(pairingUrl, {small: true});
+        })
+    
+    } catch(e) {
+        console.log(chalk.red(e.stack))
+        process.exit(1)
+    }
+    process.exit(0)
+}

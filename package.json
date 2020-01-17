@@ -23,6 +23,12 @@
   "author": "Outer Corner (https://outercorner.com)",
   "license": "ISC",
   "dependencies": {
-    "commander": "^4.1.0"
+    "chalk": "^3.0.0",
+    "clear": "^0.1.0",
+    "commander": "^4.1.0",
+    "isomorphic-ws": "^4.0.1",
+    "qrcode-terminal": "^0.12.0",
+    "secure-random": "^1.1.2",
+    "ws": "^7.2.1"
   }
 }
