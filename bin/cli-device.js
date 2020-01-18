@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-const { pairDevice } = require('../lib')
 const clear = require('clear');
 const chalk = require('chalk');
 const qrcode = require('qrcode-terminal');
-
 const program = require('commander');
+const { pairDevice } = require('../lib')
+const { getStaticKeyPair } = require('./cli-common')
 
 program.name("secrets device")
 
@@ -37,7 +37,8 @@ program.parse(process.argv)
 
 async function pair(smallQR) {
     try {
-        const device = await pairDevice('wss://chat.outercorner.com/v1/', (pairingInfo) => {
+        const staticKeyPair = await getStaticKeyPair()
+        const device = await pairDevice('wss://chat.outercorner.com/v1/', staticKeyPair, (pairingInfo) => {
             const pairingUrl = pairingInfo.url
             // clear()
             qrcode.generate(pairingUrl, {small: smallQR});
@@ -49,3 +50,4 @@ async function pair(smallQR) {
     }
     process.exit(0)
 }
+
