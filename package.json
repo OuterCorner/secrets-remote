@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "cli": "node bin/cli.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "bin": {
     "secrets": "bin/cli.js",
@@ -31,5 +31,9 @@
     "qrcode-terminal": "^0.12.0",
     "secure-random": "^1.1.2",
     "ws": "^7.2.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0"
   }
 }

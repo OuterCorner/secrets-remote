@@ -37,7 +37,7 @@ program.parse(process.argv)
 
 async function pair(smallQR) {
     try {
-        const device = await pairDevice((pairingInfo) => {
+        const device = await pairDevice('wss://chat.outercorner.com/v1/', (pairingInfo) => {
             const pairingUrl = pairingInfo.url
             // clear()
             qrcode.generate(pairingUrl, {small: smallQR});
