@@ -8,6 +8,48 @@ var handlingFunctions = {
             peerId: connectionId
         }
         ws.send(JSON.stringify(response));
+    },
+    
+    handlePingRequest: async function(ws, message) {
+        let response = {  type: "pong", role: "response" }
+        response.messageId = message.messageId
+        ws.send(JSON.stringify(response))
+    },
+
+    handleDirectMessageRequest: async function(ws, message) {
+        let peerId = message.peerId
+        let connectionId = getClientIdForSocket(ws)
+        let response = { type: "directMessage", role: "response" }
+        response.messageId = message.messageId
+
+        if (typeof peerId == "string") {
+            let directMessage = { type: "directMessage", role: "notification" }
+            directMessage.notification = {
+                senderId: connectionId,
+                message: message.message
+            }
+            let peerWs = connectedClients[peerId]
+            if (peerWs) {
+                peerWs.send(JSON.stringify(directMessage))
+                response.result = {
+                    status: 200,
+                    message: "Sent"
+                }
+            }
+            else {
+                response.result = {
+                    status: e.statusCode,
+                    message: (e.statusCode === 410) ? "Peer not connected" : e.message
+                }
+            }
+        } 
+        else {
+            response.result = {
+                status: 400,
+                message: "Missing 'peerId' value in request"
+            }
+        }
+        ws.send(JSON.stringify(response))
     }
 }
 
