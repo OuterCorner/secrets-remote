@@ -54,7 +54,7 @@ var handlingFunctions = {
 }
 
 var connectedClients = {}
-var clientId = 0
+var clientId = 1234
 
 module.exports = function(port) {
     var WebSocketServer = require('ws').Server;

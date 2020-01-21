@@ -39,6 +39,7 @@ describe('Pairing', function() {
                 const pairingInfoPromise = new DeferredPromise()
                 let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
                     pairingInfoPromise.resolve(pairingInfo)
+                    return { deviceName: "Requester App"}
                 })
                 const pairingInfo = await pairingInfoPromise.promise
                 assert.typeOf(pairingInfo.peerId, 'string')
@@ -58,10 +59,23 @@ describe('Pairing', function() {
 
                 noiseSession.bindToChatClient(cc, pairingInfo.peerId)
 
+                // wait for handshake to complete
                 await noiseSession.whenEstablished()
+
+                // request pairing
+                noiseSession.sendMessage({
+                    messageId: 1,
+                    type: 'pair',
+                    role: 'request',
+                    device_name: 'Remote App',
+                    apns_token: '740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad'
+                })
 
                 return pairingPromise.then(device => {
                     assert.isNotNull(device)
+                    assert.equal(device.deviceName, 'Remote App')
+                    assert.equal(device.apnsToken, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
+                    assert.deepEqual(device.publicKey, this.clientStaticKeyPair.pub)
                 })
             } catch (error) {
                 console.error(error)
