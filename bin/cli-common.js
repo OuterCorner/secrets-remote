@@ -1,9 +1,12 @@
-const { getNoiseLib } = require('../lib')
 const os = require('os')
 const path = require('path')
 const base64js = require('base64-js')
 const store = require('data-store')({home: path.join(os.homedir(),'.outercorner'), name: "secrets-remote"})
+const chalk = require("chalk");
+const chalkTable = require("chalk-table");
+const _ = require('lodash')
 
+const { getNoiseLib } = require('../lib')
 
 async function getStaticKeyPair(){
     function convert(keyPair, mappingFunction){
@@ -27,4 +30,29 @@ async function getStaticKeyPair(){
     return keyPair
 }
 
-module.exports = { getStaticKeyPair, store }
+function tabularDeviceData(origDevices, numbered = false, highlightedDevice) {
+    let devices = _.cloneDeep(origDevices)
+    let options = {
+        leftPad: 2,
+        columns: [
+          { field: "name",  name: chalk.white("Name") },
+          { field: "publicKey", name: chalk.white("Public Key") },
+          { field: "apnsToken",  name: chalk.white("Push Token") }
+        ]
+    }
+    if (numbered) {
+        options.columns.unshift({ field: "index",  name: chalk.gray("#") })
+        devices.forEach((device, idx) => {device.index = idx; return device })
+    }
+
+    if(highlightedDevice) {
+        const idx = origDevices.findIndex((device) => device == highlightedDevice)
+        if (idx >= 0) {
+            let featured = devices[idx]
+            Object.keys(featured).forEach(key => featured[key] = chalk.green(featured[key]))
+        }
+    }
+    return chalkTable(options, devices)
+}
+
+module.exports = { getStaticKeyPair, store, tabularDeviceData }

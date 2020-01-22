@@ -28,7 +28,8 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/bin/cli-device.js",
-            "args": ["pair"]
+            "args": ["pair"],
+            "console": "integratedTerminal"
         }
     ]
 }

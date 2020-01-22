@@ -5,12 +5,11 @@ const { DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
 
 
-
 const chatServerPort = 8085
 
-describe('Pairing', function() {
-        
-    before(async function() {
+describe('Pairing functions', function () {
+
+    before(async function () {
         this.chatServer = startMockChatServer(chatServerPort)
         const noise = await getNoiseLib()
         const serverKeys = noise.CreateKeyPair(noise.constants.NOISE_DH_CURVE25519)
@@ -26,12 +25,12 @@ describe('Pairing', function() {
         }
     })
 
-    after(function(done) {
+    after(function (done) {
         this.chatServer.close(done)
     })
 
-    describe('#pairDevice()', function() {
-        it('Should return device on successful pairing', async function() {
+    describe('#pairDevice()', function () {
+        it('Should return device on successful pairing', async function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
@@ -39,7 +38,7 @@ describe('Pairing', function() {
                 const pairingInfoPromise = new DeferredPromise()
                 let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
                     pairingInfoPromise.resolve(pairingInfo)
-                    return { deviceName: "Requester App"}
+                    return { deviceName: "Requester App" }
                 })
                 const pairingInfo = await pairingInfoPromise.promise
                 assert.typeOf(pairingInfo.peerId, 'string')
@@ -48,7 +47,7 @@ describe('Pairing', function() {
                 assert.equal(pairingInfo.url.protocol, 'secrets:')
                 assert.equal(pairingInfo.url.searchParams.get('pairing-secret'), pairingInfo.secret)
                 assert.equal(pairingInfo.url.searchParams.get('requester-id'), pairingInfo.peerId)
-                
+
                 // connect a client
                 const cc = await new ChatClient(serverAddr).connected()
                 // setup client noise session
@@ -71,16 +70,18 @@ describe('Pairing', function() {
                     apns_token: '740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad'
                 })
 
+                
                 return pairingPromise.then(device => {
                     assert.isNotNull(device)
-                    assert.equal(device.deviceName, 'Remote App')
+                    assert.equal(device.name, 'Remote App')
                     assert.equal(device.apnsToken, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
-                    assert.deepEqual(device.publicKey, this.clientStaticKeyPair.pub)
+                    assert.equal(device.publicKey, base64js.fromByteArray(this.clientStaticKeyPair.pub))
                 })
             } catch (error) {
                 console.error(error)
-                throw error 
+                throw error
             }
         });
     });
 });
+
