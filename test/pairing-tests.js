@@ -83,5 +83,47 @@ describe('Pairing functions', function () {
             }
         });
     });
+
+    describe('#pairDevice()', function () {
+        it('Should fail on incorrect psk', async function () {
+            try {
+                const serverAddr = `ws://localhost:${chatServerPort}`
+
+                // start pairing
+                const pairingInfoPromise = new DeferredPromise()
+                let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
+                    pairingInfoPromise.resolve(pairingInfo)
+                    return { deviceName: "Requester App" }
+                })
+                const pairingInfo = await pairingInfoPromise.promise
+
+                const bogusPsk = "smL2lknkEQDeD++EuctCvfiNuaCPQHNPvmVaYTHzEIY="
+
+                // connect a client
+                const cc = await new ChatClient(serverAddr).connected()
+                // setup client noise session
+                const noiseSession = new NoiseSession(this.noise, "NoisePSK_XX_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
+                    handshake.Initialize(null, this.clientStaticKeyPair.priv, null, base64js.toByteArray(bogusPsk))
+                })
+                noiseSession.start()
+
+                noiseSession.bindToChatClient(cc, pairingInfo.peerId)
+
+                return pairingPromise.then(
+                    () => {
+                        Promise.reject(new Error('Expected method to reject.'))
+                    },
+                    err => {
+                        console.log(err)
+                        assert.instanceOf(err, Error)
+                    }
+                )
+
+            } catch (error) {
+                console.error(error)
+                throw error
+            }
+        });
+    });
 });
 
