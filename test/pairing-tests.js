@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const base64js = require('base64-js')
 const { NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
-const { DeferredPromise } = require('../lib/util')
+const { promiseTimeout, DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
 
 
@@ -107,9 +107,10 @@ describe('Pairing functions', function () {
                 })
                 noiseSession.start()
 
-                noiseSession.messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
+                const messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
+                messenger.keepAliveInterval = 1000
 
-                return pairingPromise.then(
+                const pairingFailedPromise = pairingPromise.then(
                     () => {
                         Promise.reject(new Error('Expected method to reject.'))
                     },
@@ -118,7 +119,10 @@ describe('Pairing functions', function () {
                         assert.instanceOf(err, Error)
                     }
                 )
+                const peerDisconnected = new DeferredPromise()
+                messenger.on("peerDisconnect", () => peerDisconnected.resolve())
 
+                return promiseTimeout(3000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
             } catch (error) {
                 console.error(error)
                 throw error
