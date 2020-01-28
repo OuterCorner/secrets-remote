@@ -38,8 +38,8 @@ var handlingFunctions = {
             }
             else {
                 response.result = {
-                    status: e.statusCode,
-                    message: (e.statusCode === 410) ? "Peer not connected" : e.message
+                    status: 410,
+                    message: "Peer not connected"
                 }
             }
         } 
@@ -61,7 +61,8 @@ module.exports = function(port) {
     var wss = new WebSocketServer({ port: port });
     
     wss.on('connection', function (ws) {
-        connectedClients[`${clientId++}`] = ws
+        const cid = `${clientId++}`
+        connectedClients[cid] = ws
 
         ws.on('message', function (data) {
             const message = JSON.parse(data);
@@ -74,6 +75,9 @@ module.exports = function(port) {
         
             handlingFunction.call(this, ws, message)
         });
+        ws.on('close', function(){
+            delete connectedClients[cid]
+        })
     });
     return wss
 }

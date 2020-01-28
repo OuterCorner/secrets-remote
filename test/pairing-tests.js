@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 const base64js = require('base64-js')
-const { NoiseSession, ChatClient, pairDevice, getNoiseLib } = require('../lib')
+const { NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
 const { DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
 
@@ -56,7 +56,7 @@ describe('Pairing functions', function () {
                 })
                 noiseSession.start()
 
-                noiseSession.bindToChatClient(cc, pairingInfo.peerId)
+                noiseSession.messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
 
                 // wait for handshake to complete
                 await noiseSession.whenEstablished()
@@ -107,7 +107,7 @@ describe('Pairing functions', function () {
                 })
                 noiseSession.start()
 
-                noiseSession.bindToChatClient(cc, pairingInfo.peerId)
+                noiseSession.messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
 
                 return pairingPromise.then(
                     () => {
