@@ -34,11 +34,11 @@ program
 
 // list command
 program
-    .command('delete <id>')
+    .command('delete <name or index>')
     .option('-y, --accept-deletion', 'automatically accept deletion of device')
     .description("delete a paired device")
-    .action( function(deviceId) {
-        del(parseInt(deviceId), this.acceptDeletion)
+    .action( function(device) {
+        del(device, this.acceptDeletion)
     })
 
 program.parse(process.argv)
@@ -84,14 +84,25 @@ function list() {
     console.log(tabularDeviceData(devices, true))
 }
 
-async function del(index, autoAccept = false) {
+async function del(deviceArg, autoAccept = false) {
     let devices = store.get('devices') || []
     
-    if (isNaN(index) || (index < 0 || index >= devices.length)) {
-        console.error(chalk.red(`ID ${index} is not valid`))
+    var device = undefined
+    devices.forEach(d => {
+        if (d.name == deviceArg) {
+            device = d
+        }
+    });
+    if (!device) {
+        const index = parseInt(deviceArg)
+        if (!isNaN(index) && (index >= 0 && index < devices.length)) {
+            device = devices[index]
+        }
+    }
+    if (!device) {
+        console.error(chalk.red(`Could not find the requested device: ${deviceArg}`))
         process.exit(1)
     }
-    const device = devices[index]
 
     if (!autoAccept) {
         const proceed = await inquirer.prompt([{ 
@@ -105,7 +116,7 @@ async function del(index, autoAccept = false) {
         }
     }
 
-    devices.splice(index, 1)
+    devices.splice(devices.indexOf(device), 1)
     store.set('devices', devices)
     console.log(chalk.green('√') + ` Device "${device.name}" deleted!`)
 }
