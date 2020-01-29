@@ -30,6 +30,17 @@
             "program": "${workspaceFolder}/bin/cli-device.js",
             "args": ["pair"],
             "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Request Secret",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/bin/cli-request.js",
+            "args": ["facebook"],
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -35,6 +35,9 @@
     "noise-c.wasm": "^0.4.0",
     "qrcode-terminal": "^0.12.0",
     "secure-random": "^1.1.2",
+    "superagent": "^5.2.1",
+    "superagent-prefix": "0.0.2",
+    "superagent-use": "^0.1.0",
     "text-encoding": "^0.7.0",
     "ws": "^7.2.1"
   },

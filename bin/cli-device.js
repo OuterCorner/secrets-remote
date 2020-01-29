@@ -55,7 +55,7 @@ async function pair(smallQR, autoAcceptName) {
         })
     
         // const device = {name: "Remote App", apnsToken: "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb38746safafafafa", publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="}
-        console.log(chalk.green('√') + " Pairing successful!")
+        console.log(chalk.green('✓') + " Pairing successful!")
 
         let deviceName = device.name
         if (!autoAcceptName) {

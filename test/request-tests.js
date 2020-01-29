@@ -7,7 +7,7 @@ const startMockChatServer = require('./mock-chat-server')
 
 const chatServerPort = 8085
 
-describe('Pairing devices', function () {
+describe('Requesting secrets', function () {
 
     before(async function () {
         this.chatServer = startMockChatServer(chatServerPort)
@@ -29,11 +29,26 @@ describe('Pairing devices', function () {
         this.chatServer.close(done)
     })
 
-    describe('#pairDevice()', function () {
-        it('Should return device on successful pairing', async function () {
+    describe('#requestSecret()', function () {
+        it('Should return item on success', async function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
+                const devices = [
+                    {
+                        name: "Mocha Test",
+                        apnsToken: "successToken",
+                        publicKey: base64js.fromByteArray(this.clientStaticKeyPair.pub)
+                    },
+                    {
+                        name: "Stale device",
+                        apnsToken: "56d4d18a3a9db52b13595bd735c709d7c1f9f0979a6a0eb1ac9ef7fe5bfd007c",
+                        publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="
+                    }
+                ]
+                const query = {
+                    
+                }
                 // start pairing
                 const pairingInfoPromise = new DeferredPromise()
                 let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
@@ -77,52 +92,6 @@ describe('Pairing devices', function () {
                     assert.equal(device.apnsToken, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
                     assert.equal(device.publicKey, base64js.fromByteArray(this.clientStaticKeyPair.pub))
                 })
-            } catch (error) {
-                console.error(error)
-                throw error
-            }
-        });
-    });
-
-    describe('#pairDevice()', function () {
-        it('Should fail on incorrect psk', async function () {
-            try {
-                const serverAddr = `ws://localhost:${chatServerPort}`
-
-                // start pairing
-                const pairingInfoPromise = new DeferredPromise()
-                let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
-                    pairingInfoPromise.resolve(pairingInfo)
-                    return { deviceName: "Requester App" }
-                })
-                const pairingInfo = await pairingInfoPromise.promise
-
-                const bogusPsk = "smL2lknkEQDeD++EuctCvfiNuaCPQHNPvmVaYTHzEIY="
-
-                // connect a client
-                const cc = await new ChatClient(serverAddr).connected()
-                // setup client noise session
-                const noiseSession = new NoiseSession(this.noise, "NoisePSK_XX_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
-                    handshake.Initialize(null, this.clientStaticKeyPair.priv, null, base64js.toByteArray(bogusPsk))
-                })
-                noiseSession.start()
-
-                const messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
-                messenger.keepAliveInterval = 1000
-
-                const pairingFailedPromise = pairingPromise.then(
-                    () => {
-                        Promise.reject(new Error('Expected method to reject.'))
-                    },
-                    err => {
-                        console.log(err)
-                        assert.instanceOf(err, Error)
-                    }
-                )
-                const peerDisconnected = new DeferredPromise()
-                messenger.on("peerDisconnect", () => peerDisconnected.resolve())
-
-                return promiseTimeout(3000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
             } catch (error) {
                 console.error(error)
                 throw error
