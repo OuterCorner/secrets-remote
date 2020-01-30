@@ -3,7 +3,7 @@ const base64js = require('base64-js')
 const { NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
 const { promiseTimeout, DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
-
+const mockPushService = require('superagent-mocker')(require('superagent'));
 
 const chatServerPort = 8085
 
@@ -34,7 +34,7 @@ describe('Requesting secrets', function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
-                const devices = [
+                const mockDevices = [
                     {
                         name: "Mocha Test",
                         apnsToken: "successToken",
@@ -46,9 +46,12 @@ describe('Requesting secrets', function () {
                         publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="
                     }
                 ]
-                const query = {
-                    
-                }
+                const mockQuery = { searchString = "survs", url = new URL("https://survs.com/app"), item = { type: "login", attributes: ["username", "password"] }}
+                
+
+
+                const item = requestSecret(serverAddr, this.clientStaticKeyPair, pushService, mockDevices, mockQuery, callbacks)
+
                 // start pairing
                 const pairingInfoPromise = new DeferredPromise()
                 let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
