@@ -34,7 +34,7 @@ describe('Requesting secrets', function () {
         this.chatServer.close(done)
     })
 
-    describe.only('#requestSecret()', function () {
+    describe('#requestSecret()', function () {
         it('Should succesfully return an item', async function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
@@ -123,14 +123,43 @@ describe('Requesting secrets', function () {
 
                 // connect a client
                 const cc = await new ChatClient(serverAddr).connected()
-                const peerMessenger = new PeerMessenger(cc)
+                const peerMessenger = new PeerMessenger(cc, undefined, peerId)
                 
                 // send hello
-                await peerMessenger.sendRequestMessage({"type": "hello", "public_key": base64js.fromByteArray(this.clientStaticKeyPair.pub)})
+                await peerMessenger.sendRequestMessage({
+                        "type": "hello", 
+                        "public_key": base64js.fromByteArray(this.clientStaticKeyPair.pub)
+                    })
                 await wait(50, pushRequestExpectation) // should already be resolved
 
+                // start noise session
+                const noiseSession = new NoiseSession(this.noise, "Noise_KK_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
+                    handshake.Initialize(null, this.clientStaticKeyPair.priv, this.serverStaticKeyPair.pub, null)
+                })
+                noiseSession.start()
+                peerMessenger.noiseSession = noiseSession
+                
+                
+                const request = await noiseSession.onceMessageReceived({type: "query", role: "request"})
 
+                assert.equal(request.searchString, mockQuery.searchString)
+                assert.equal(request.url, mockQuery.url)
+                assert.deepEqual(request.item, mockQuery.item)
 
+                noiseSession.sendMessage({
+                    "type": "query",
+                    "role": "response",
+                    "messageId": request.messageId,
+                    "item": {
+                        "username": "John Doe",
+                        "password": "123456"
+                    }
+                })
+
+                return resultPromise.then(item => {
+                    assert.equal(item.username, "John Doe")
+                    assert.equal(item.password, "123456")
+                })
             } catch (error) {
                 console.error(error)
                 throw error
