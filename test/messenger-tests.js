@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 const { ChatClient, PeerMessenger } = require('../lib')
-const { promiseTimeout, DeferredPromise } = require('../lib/util')
+const { wait, DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
 
 const chatServerPort = 8086
@@ -42,7 +42,7 @@ describe('Peer messaging', function () {
                 cc2.disconnect()
 
                 // client 1 should detect that peer as droped off in a reasonable ammount of time (< 2 seconds)
-                return promiseTimeout(2000, client2Disconnected.promise)
+                return wait(2000, client2Disconnected.promise)
 
             } catch (error) {
                 console.error(error)

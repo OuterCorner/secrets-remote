@@ -1,9 +1,14 @@
 const assert = require('chai').assert
 const base64js = require('base64-js')
-const { NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
-const { promiseTimeout, DeferredPromise } = require('../lib/util')
+const pushService = require('superagent');
+const mockPushService = require('superagent-mocker')(pushService);
 const startMockChatServer = require('./mock-chat-server')
-const mockPushService = require('superagent-mocker')(require('superagent'));
+const { requestSecret, NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
+const { wait, DeferredPromise } = require('../lib/util')
+const { expectation } = require('./test-utils')
+
+
+
 
 const chatServerPort = 8085
 
@@ -29,72 +34,103 @@ describe('Requesting secrets', function () {
         this.chatServer.close(done)
     })
 
-    describe('#requestSecret()', function () {
-        it('Should return item on success', async function () {
+    describe.only('#requestSecret()', function () {
+        it('Should succesfully return an item', async function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
                 const mockDevices = [
                     {
                         name: "Mocha Test",
-                        apnsToken: "successToken",
+                        apnsToken: "bogusSuccessToken",
                         publicKey: base64js.fromByteArray(this.clientStaticKeyPair.pub)
                     },
                     {
                         name: "Stale device",
-                        apnsToken: "56d4d18a3a9db52b13595bd735c709d7c1f9f0979a6a0eb1ac9ef7fe5bfd007c",
+                        apnsToken: "bogusFailingToken",
                         publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="
                     }
                 ]
-                const mockQuery = { searchString = "survs", url = new URL("https://survs.com/app"), item = { type: "login", attributes: ["username", "password"] }}
-                
+                const mockQuery = { searchString: "survs", url: new URL("https://survs.com/app"), item: { type: "login", attributes: ["username", "password"] } }
 
-
-                const item = requestSecret(serverAddr, this.clientStaticKeyPair, pushService, mockDevices, mockQuery, callbacks)
-
-                // start pairing
-                const pairingInfoPromise = new DeferredPromise()
-                let pairingPromise = pairDevice(serverAddr, this.serverStaticKeyPair, (pairingInfo) => {
-                    pairingInfoPromise.resolve(pairingInfo)
-                    return { deviceName: "Requester App" }
+                var peerId = undefined
+                const pushRequestExpectation = expectation((request) => {
+                    assert.equal(request.body.devices.length, 2)
+                    peerId = request.body.payload.peer_id
+                    assert.exists(peerId)
+                    assert.equal(request.body.payload.public_key, base64js.fromByteArray(this.serverStaticKeyPair.pub))
                 })
-                const pairingInfo = await pairingInfoPromise.promise
-                assert.typeOf(pairingInfo.peerId, 'string')
-                assert.typeOf(pairingInfo.secret, 'string')
-                assert.instanceOf(pairingInfo.url, URL)
-                assert.equal(pairingInfo.url.protocol, 'secrets:')
-                assert.equal(pairingInfo.url.searchParams.get('pairing-secret'), pairingInfo.secret)
-                assert.equal(pairingInfo.url.searchParams.get('requester-id'), pairingInfo.peerId)
+                mockPushService.post("/push", (req) => {
+                    pushRequestExpectation.fulfill(req)
+                    return {
+                        body: {
+                            "push_id": "7b7b3699-d4b6-42cf-a407-bbe8756f459f",
+                            "results": {
+                                "bogusSuccessToken": {
+                                    "DeliveryStatus": "SUCCESSFUL",
+                                    "StatusCode": 200,
+                                    "StatusMessage": ""
+                                },
+                                "bogusFailingToken": {
+                                    "DeliveryStatus": "PERMANENT_FAILURE",
+                                    "StatusCode": 410,
+                                    "StatusMessage": "{\"errorMessage\":\"Unregistered or expired token\",\"channelType\":\"APNS_SANDBOX\",\"pushProviderStatusCode\":\"400\",\"pushProviderError\":\"BadDeviceToken\",\"pushProviderResponse\":\"{\\\"reason\\\":\\\"BadDeviceToken\\\"}\"}"
+                                }
+                            }
+                        }
+                    }
+                })
+                
+                const pushDelRequestExpectation = expectation((request) => {
+                    // assert all devices are notified
+                    assert.equal(request.body.devices.count, 1)
+                    assert.equal(request.body.devices[0].token, mockDevices[0].apnsToken)
+                })
+
+                mockPushService.del("/push", (req) => {
+                    pushDelRequestExpectation.fulfill(req)
+                    return {
+                        body: {
+                            "results": {
+                                "bogusSuccessToken": {
+                                    "DeliveryStatus": "SUCCESSFUL",
+                                    "StatusCode": 200,
+                                    "StatusMessage": ""
+                                }
+                            }
+                        }
+                    }
+                })
+
+                const successFullPushNotification = expectation((device) => {
+                    assert.equal(device.name, "Mocha Test")
+                })
+                const failedPushNotification = expectation((device) => {
+                    assert.equal(device.name, "Stale device")
+                })
+
+                const callbacks = {
+                    notificationFailedForDevice: (device, reason) => {
+                        failedPushNotification.fulfill(device)
+                    },
+                    notificationSucceededForDevice: (device) => {
+                        successFullPushNotification.fulfill(device)
+                    }
+                }
+
+                const resultPromise = requestSecret(serverAddr, this.serverStaticKeyPair, pushService, mockDevices, mockQuery, callbacks)
+                await wait(500, Promise.all([pushRequestExpectation, successFullPushNotification, failedPushNotification]))
 
                 // connect a client
                 const cc = await new ChatClient(serverAddr).connected()
-                // setup client noise session
-                const noiseSession = new NoiseSession(this.noise, "NoisePSK_XX_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
-                    handshake.Initialize(null, this.clientStaticKeyPair.priv, null, base64js.toByteArray(pairingInfo.secret))
-                })
-                noiseSession.start()
-
-                noiseSession.messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
-
-                // wait for handshake to complete
-                await noiseSession.whenEstablished()
-
-                // request pairing
-                noiseSession.sendMessage({
-                    messageId: 1,
-                    type: 'pair',
-                    role: 'request',
-                    device_name: 'Remote App',
-                    apns_token: '740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad'
-                })
-
+                const peerMessenger = new PeerMessenger(cc)
                 
-                return pairingPromise.then(device => {
-                    assert.isNotNull(device)
-                    assert.equal(device.name, 'Remote App')
-                    assert.equal(device.apnsToken, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
-                    assert.equal(device.publicKey, base64js.fromByteArray(this.clientStaticKeyPair.pub))
-                })
+                // send hello
+                await peerMessenger.sendRequestMessage({"type": "hello", "public_key": base64js.fromByteArray(this.clientStaticKeyPair.pub)})
+                await wait(50, pushRequestExpectation) // should already be resolved
+
+
+
             } catch (error) {
                 console.error(error)
                 throw error

@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const base64js = require('base64-js')
 const { NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
-const { promiseTimeout, DeferredPromise } = require('../lib/util')
+const { wait, DeferredPromise } = require('../lib/util')
 const startMockChatServer = require('./mock-chat-server')
 
 
@@ -122,7 +122,7 @@ describe('Pairing devices', function () {
                 const peerDisconnected = new DeferredPromise()
                 messenger.on("peerDisconnect", () => peerDisconnected.resolve())
 
-                return promiseTimeout(3000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
+                return wait(3000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
             } catch (error) {
                 console.error(error)
                 throw error
