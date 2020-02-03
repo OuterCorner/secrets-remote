@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const qrcode = require('qrcode-terminal');
 const program = require('commander');
 const inquirer = require('inquirer');
+const os = require('os')
 const { pairDevice } = require('../lib')
 const { getStaticKeyPair, store, tabularDeviceData } = require('./cli-common')
 
@@ -51,7 +52,9 @@ async function pair(smallQR, autoAcceptName) {
         const device = await pairDevice('wss://chat.outercorner.com/v1/', staticKeyPair, (pairingInfo) => {
             const pairingUrl = pairingInfo.url
             clear()
-            qrcode.generate(pairingUrl, {small: smallQR});
+            qrcode.generate(pairingUrl, {small: smallQR})
+            console.log("To pair with this machine, use your device's camera to read the QR Code above.")
+            return os.hostname().split(".")[0]
         })
     
         // const device = {name: "Remote App", apnsToken: "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb38746safafafafa", publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="}
