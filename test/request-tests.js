@@ -149,7 +149,7 @@ describe('Requesting secrets', function () {
                 noiseSession.sendMessage({
                     "type": "query",
                     "role": "response",
-                    "messageId": request.messageId,
+                    "message_id": request.message_id,
                     "item": {
                         "username": "John Doe",
                         "password": "123456"

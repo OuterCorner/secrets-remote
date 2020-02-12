@@ -27,8 +27,8 @@ describe('Peer messaging', function () {
                 const messenger1 = new PeerMessenger(cc1)
                 const messenger2 = new PeerMessenger(cc2)
 
-                const peer1Id = await cc1.request({ type: "hello" }).then(rsp => rsp.peerId)
-                const peer2Id = await cc2.request({ type: "hello" }).then(rsp => rsp.peerId)
+                const peer1Id = await cc1.request({ type: "hello" }).then(rsp => rsp.peer_id)
+                const peer2Id = await cc2.request({ type: "hello" }).then(rsp => rsp.peer_id)
 
                 messenger1.peerId = peer2Id
                 messenger2.peerId = peer1Id

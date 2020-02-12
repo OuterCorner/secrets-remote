@@ -63,7 +63,7 @@ describe('Pairing devices', function () {
 
                 // request pairing
                 noiseSession.sendMessage({
-                    messageId: 1,
+                    message_id: 1,
                     type: 'pair',
                     role: 'request',
                     device_name: 'Remote App',

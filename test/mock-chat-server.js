@@ -2,30 +2,30 @@ var handlingFunctions = {
     handleHelloRequest: async function(ws, message) {
         let response = { type: "hello", role: "response" }
         let connectionId = getClientIdForSocket(ws)
-        response.messageId = message.messageId
+        response.message_id = message.message_id
         response.result = {
             status: 200,
-            peerId: connectionId
+            peer_id: connectionId
         }
         ws.send(JSON.stringify(response));
     },
     
     handlePingRequest: async function(ws, message) {
         let response = {  type: "pong", role: "response" }
-        response.messageId = message.messageId
+        response.message_id = message.message_id
         ws.send(JSON.stringify(response))
     },
 
     handleDirectMessageRequest: async function(ws, message) {
-        let peerId = message.peerId
+        let peerId = message.peer_id
         let connectionId = getClientIdForSocket(ws)
         let response = { type: "directMessage", role: "response" }
-        response.messageId = message.messageId
+        response.message_id = message.message_id
 
         if (typeof peerId == "string") {
             let directMessage = { type: "directMessage", role: "notification" }
             directMessage.notification = {
-                senderId: connectionId,
+                sender_id: connectionId,
                 message: message.message
             }
             let peerWs = connectedClients[peerId]
@@ -46,7 +46,7 @@ var handlingFunctions = {
         else {
             response.result = {
                 status: 400,
-                message: "Missing 'peerId' value in request"
+                message: "Missing 'peer_id' value in request"
             }
         }
         ws.send(JSON.stringify(response))
