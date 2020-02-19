@@ -20,10 +20,11 @@ var handlingFunctions = {
         let peerId = message.peer_id
         let connectionId = getClientIdForSocket(ws)
         let response = { type: "directMessage", role: "response" }
-        response.message_id = message.message_id
+        let messageId = message.message_id
+        response.message_id = messageId
 
         if (typeof peerId == "string") {
-            let directMessage = { type: "directMessage", role: "notification" }
+            let directMessage = { type: "directMessage", role: "notification", message_id: messageId }
             directMessage.notification = {
                 sender_id: connectionId,
                 message: message.message
