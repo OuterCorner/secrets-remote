@@ -9,7 +9,8 @@
   },
   "bin": {
     "secrets": "bin/cli.js",
-    "secrets-device": "bin/cli-device.js"
+    "secrets-device": "bin/cli-device.js",
+    "secrets-request": "bin/cli-request.js"
   },
   "keywords": [
     "secrets",
