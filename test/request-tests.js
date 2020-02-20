@@ -126,7 +126,7 @@ describe('Requesting secrets', function () {
                 const peerMessenger = new PeerMessenger(cc, undefined, peerId)
                 
                 // send hello
-                await peerMessenger.sendRequestMessage({
+                await peerMessenger.sendNotificationMessage({
                         "type": "hello", 
                         "public_key": base64js.fromByteArray(this.clientStaticKeyPair.pub)
                     })

@@ -44,7 +44,8 @@ describe('Pairing devices', function () {
                 assert.typeOf(pairingInfo.peerId, 'string')
                 assert.typeOf(pairingInfo.secret, 'string')
                 assert.instanceOf(pairingInfo.url, URL)
-                assert.equal(pairingInfo.url.protocol, 'secrets:')
+                assert.equal(pairingInfo.url.protocol, 'https:')
+                assert.equal(pairingInfo.url.host, 'secrets.app')
                 assert.equal(pairingInfo.url.searchParams.get('pairing-secret'), pairingInfo.secret)
                 assert.equal(pairingInfo.url.searchParams.get('requester-id'), pairingInfo.peerId)
 
