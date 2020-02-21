@@ -126,11 +126,16 @@ describe('Requesting secrets', function () {
                 const peerMessenger = new PeerMessenger(cc, undefined, peerId)
                 
                 // send hello
-                await peerMessenger.sendNotificationMessage({
+                peerMessenger.sendSetupMessage({
+                        "message_id": 1,
                         "type": "hello", 
+                        "role": "request",
                         "public_key": base64js.fromByteArray(this.clientStaticKeyPair.pub)
                     })
+
                 await wait(50, pushRequestExpectation) // should already be resolved
+
+                await peerMessenger.onceSetupMessageReceived({type: "hello", role: "response" })
 
                 // start noise session
                 const noiseSession = new NoiseSession(this.noise, "Noise_KK_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
