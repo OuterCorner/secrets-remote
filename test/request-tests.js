@@ -3,8 +3,8 @@ const base64js = require('base64-js')
 const pushService = require('superagent');
 const mockPushService = require('superagent-mocker')(pushService);
 const startMockChatServer = require('./mock-chat-server')
-const { requestSecret, NoiseSession, ChatClient, PeerMessenger, pairDevice, getNoiseLib } = require('../lib')
-const { wait, DeferredPromise } = require('../lib/util')
+const { requestSecret, NoiseSession, ChatClient, PeerMessenger, PushNotificationService, getNoiseLib } = require('../lib')
+const { wait } = require('../lib/util')
 const { expectation } = require('./test-utils')
 
 
@@ -109,16 +109,16 @@ describe('Requesting secrets', function () {
                     assert.equal(device.name, "Stale device")
                 })
 
-                const callbacks = {
-                    notificationFailedForDevice: (device, reason) => {
-                        failedPushNotification.fulfill(device)
-                    },
-                    notificationSucceededForDevice: (device) => {
-                        successFullPushNotification.fulfill(device)
-                    }
-                }
+                const notificationService = new PushNotificationService(pushService)
+                notificationService.once("pushed", (device) => {
+                    successFullPushNotification.fulfill(device)
+                })
+                notificationService.once("error", (error) => {
+                    failedPushNotification.fulfill(error.device)
+                })
 
-                const resultPromise = requestSecret(serverAddr, this.serverStaticKeyPair, pushService, mockDevices, mockQuery, callbacks)
+
+                const resultPromise = requestSecret(serverAddr, this.serverStaticKeyPair, notificationService, mockDevices, mockQuery)
                 await wait(500, Promise.all([pushRequestExpectation, successFullPushNotification, failedPushNotification]))
 
                 // connect a client
