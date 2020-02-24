@@ -50,9 +50,10 @@ async function pair(smallQR, autoAcceptName) {
     try {
         const staticKeyPair = await getStaticKeyPair()
         const device = await pairDevice('wss://chat.outercorner.com/v1/', staticKeyPair, (pairingInfo) => {
-            const pairingUrl = pairingInfo.url
+            const pairingUrl = pairingInfo.url.href
             clear()
             qrcode.generate(pairingUrl, {small: smallQR})
+            console.log(pairingUrl)
             console.log("To pair with this machine, use your device's camera to read the QR Code above.")
             return os.hostname().split(".")[0]
         })
