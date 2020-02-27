@@ -36,6 +36,7 @@ describe('Requesting secrets', function () {
 
     describe('#requestSecret()', function () {
         it('Should succesfully return an item', async function () {
+            this.timeout(10000)
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
@@ -122,7 +123,7 @@ describe('Requesting secrets', function () {
                 await wait(500, Promise.all([pushRequestExpectation, successFullPushNotification, failedPushNotification]))
 
                 // connect a client
-                const cc = await new ChatClient(serverAddr).connected()
+                const cc = await new ChatClient(serverAddr).connected
                 const peerMessenger = new PeerMessenger(cc, undefined, peerId)
                 
                 // send hello

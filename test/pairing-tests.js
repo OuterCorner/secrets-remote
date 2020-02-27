@@ -50,7 +50,7 @@ describe('Pairing devices', function () {
                 assert.equal(pairingInfo.url.searchParams.get('requester-id'), pairingInfo.peerId)
 
                 // connect a client
-                const cc = await new ChatClient(serverAddr).connected()
+                const cc = await new ChatClient(serverAddr).connected
                 // setup client noise session
                 const noiseSession = new NoiseSession(this.noise, "NoisePSK_XX_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
                     handshake.Initialize(null, this.clientStaticKeyPair.priv, null, base64js.toByteArray(pairingInfo.secret))
@@ -87,6 +87,7 @@ describe('Pairing devices', function () {
 
     describe('#pairDevice()', function () {
         it('Should fail on incorrect psk', async function () {
+            this.timeout(20000)
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
 
@@ -101,15 +102,18 @@ describe('Pairing devices', function () {
                 const bogusPsk = "smL2lknkEQDeD++EuctCvfiNuaCPQHNPvmVaYTHzEIY="
 
                 // connect a client
-                const cc = await new ChatClient(serverAddr).connected()
+                const cc = await new ChatClient(serverAddr).connected
                 // setup client noise session
                 const noiseSession = new NoiseSession(this.noise, "NoisePSK_XX_25519_ChaChaPoly_SHA256", this.noise.constants.NOISE_ROLE_INITIATOR, handshake => {
                     handshake.Initialize(null, this.clientStaticKeyPair.priv, null, base64js.toByteArray(bogusPsk))
                 })
                 noiseSession.start()
 
-                const messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId)
-                messenger.keepAliveInterval = 1000
+                const peerDisconnected = new DeferredPromise()
+                const messenger = new PeerMessenger(cc, noiseSession, pairingInfo.peerId, {keepAliveInterval: 500})
+                messenger.on("peerDisconnect", () => {
+                    peerDisconnected.resolve()
+                })
 
                 const pairingFailedPromise = pairingPromise.then(
                     () => {
@@ -120,10 +124,9 @@ describe('Pairing devices', function () {
                         assert.instanceOf(err, Error)
                     }
                 )
-                const peerDisconnected = new DeferredPromise()
-                messenger.on("peerDisconnect", () => peerDisconnected.resolve())
+                
 
-                return wait(3000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
+                return wait(10000, Promise.all([pairingFailedPromise, peerDisconnected.promise]))
             } catch (error) {
                 console.error(error)
                 throw error
