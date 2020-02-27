@@ -42,7 +42,7 @@ function tabularDeviceData(origDevices, numbered = false, highlightedDevice) {
     }
     if (numbered) {
         options.columns.unshift({ field: "index",  name: chalk.gray("#") })
-        devices.forEach((device, idx) => {device.index = idx; return device })
+        devices.forEach((device, idx) => {device.index = idx + 1; return device })
     }
 
     if(highlightedDevice) {

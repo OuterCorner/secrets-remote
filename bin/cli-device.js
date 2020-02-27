@@ -98,9 +98,12 @@ async function del(deviceArg, autoAccept = false) {
         }
     });
     if (!device) {
-        const index = parseInt(deviceArg)
-        if (!isNaN(index) && (index >= 0 && index < devices.length)) {
-            device = devices[index]
+        let index = parseInt(deviceArg)
+        if (!isNaN(index)) {
+            index -= 1
+            if (index >= 0 && index < devices.length) {
+                device = devices[index]
+            }
         }
     }
     if (!device) {
