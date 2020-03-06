@@ -39,7 +39,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/bin/cli-request.js",
-            "args": ["facebook"],
+            "args": ["apple"],
             "console": "integratedTerminal"
         }
     ]

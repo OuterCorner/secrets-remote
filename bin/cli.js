@@ -8,7 +8,7 @@ program
     .name("secrets")
     .usage('[global options] <command>')
     .command('device <cmd>', "manage paired devices")
-    // .command('request', "request a secret from one or more devices")
+    .command('request', "request a secret from one or more devices")
 
 program.parse(process.argv)
 

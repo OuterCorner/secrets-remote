@@ -1,10 +1,11 @@
-const program = require('commander');
-const chalk = require('chalk');
-const { requestSecret } = require('../lib')
+#!/usr/bin/env node
+const program = require('commander')
+const chalk = require('chalk')
+const { requestSecret, PushNotificationService } = require('../lib')
 const { getStaticKeyPair, store } = require('./cli-common')
-const pushService = require('superagent-use')(require('superagent'));
-const superagent_prefix = require('superagent-prefix');
-pushService.use(superagent_prefix('https://api.outercorner.com/secrets'));
+const pushService = require('superagent-use')(require('superagent'))
+const superagent_prefix = require('superagent-prefix')
+pushService.use(superagent_prefix('https://api.outercorner.com/secrets'))
 const validTypes = ['login','creditcard','bankaccount','note','softwarelicense']
 
 
@@ -73,15 +74,15 @@ async function request(searchString, url, item, devices) {
         const staticKeyPair = await getStaticKeyPair()
 
         const query = { searchString, url, item }
-        const callbacks = {
-            notificationFailedForDevice: (device, reason) => {
-                console.error(chalk.red("✕") + ` Failed to notify device "${device.name}": ${reason}`)
-            },
-            notificationSucceededForDevice: (device) => {
-                console.error(chalk.green('✓') + ` Notified device "${device.name}".`)
-            }
-        }
-        const secret = await requestSecret('wss://chat.outercorner.com/v1/', staticKeyPair, pushService, devices, query, callbacks)
+        const pns = new PushNotificationService(pushService)
+        pns.on("pushed", (device) => {
+            console.error(chalk.green('✓') + ` Notified device "${device.name}".`)
+        })
+        pns.on("error", (error) => {
+            console.error(chalk.red("✕") + ` Failed to notify device "${error.device.name}": ${error}`)
+        })
+
+        const secret = await requestSecret('wss://chat.outercorner.com/v1/', staticKeyPair, pns, devices, query)
         
 
     } catch(e) {
