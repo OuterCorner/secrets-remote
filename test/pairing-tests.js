@@ -46,8 +46,8 @@ describe('Pairing devices', function () {
                 assert.instanceOf(pairingInfo.url, URL)
                 assert.equal(pairingInfo.url.protocol, 'https:')
                 assert.equal(pairingInfo.url.host, 'secrets.app')
-                assert.equal(pairingInfo.url.searchParams.get('pairing-secret'), pairingInfo.secret)
                 assert.equal(pairingInfo.url.searchParams.get('requester-id'), pairingInfo.peerId)
+                assert.equal(pairingInfo.url.hash.substring(1), pairingInfo.secret)
 
                 // connect a client
                 const cc = await new ChatClient(serverAddr).connected
