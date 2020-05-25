@@ -39,7 +39,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/bin/cli-request.js",
-            "args": ["apple"],
+            "args": ["apple", "-t", "login:username", "-t", "creditCard:pan"],
             "console": "integratedTerminal"
         }
     ]

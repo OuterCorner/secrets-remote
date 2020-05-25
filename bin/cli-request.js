@@ -30,20 +30,28 @@ program
 
 program.parse(process.argv)
 
-function parseType(typeArg, dummyPrevious) {
+function parseType(typeArg, targetItems) {
     const components = typeArg.split(':')
     const type = components[0]
     
-    if (!validTypes.includes(type)) {
+    if (!validTypes.includes(type.toLowerCase())) {
         throw new Error(`"${type}" is not one of the expected types: ${validTypes.join(',')}`)
     }
     
-    var properties = []
+    let properties = []
     if (components.length > 1) {
         properties = components[1].split(',')
     }
 
-    return {type, properties}
+    let types = [type]
+    if (targetItems && targetItems.types) {
+        types = targetItems.types.concat(types)
+    }
+    if (targetItems && targetItems.properties) {
+        properties = targetItems.properties.concat(properties)
+    }
+
+    return {types, properties}
 }
 
 function parseDevice(deviceArg, selectedDevices = []) {

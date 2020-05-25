@@ -52,7 +52,7 @@ describe('Requesting secrets', function () {
                         publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="
                     }
                 ]
-                const mockQuery = { searchString: "survs", url: new URL("https://survs.com/app"), item: { type: "login", attributes: ["username", "password"] } }
+                const mockQuery = { searchString: "survs", url: new URL("https://survs.com/app"), item: { types: ["login"], attributes: ["username", "password"] } }
 
                 var peerId = undefined
                 const pushRequestExpectation = expectation((request) => {
