@@ -36,8 +36,7 @@ function tabularDeviceData(origDevices, numbered = false, highlightedDevice) {
         leftPad: 2,
         columns: [
           { field: "name",  name: chalk.white("Name") },
-          { field: "publicKey", name: chalk.white("Public Key") },
-          { field: "apnsToken",  name: chalk.white("Push Token") }
+          { field: "publicKey", name: chalk.white("Public Key") }
         ]
     }
     if (numbered) {
