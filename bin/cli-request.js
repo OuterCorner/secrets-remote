@@ -17,7 +17,7 @@ program
 program
     .arguments('<search> [options]')
     .option('-u, --url <url>', 'url of associated service', (url) => new URL(url))
-    .option('-t, --type <type>', `type of item [${validTypes.join('|')}]`, parseType, 'login')
+    .option('-t, --type <type>', `type of item [${validTypes.join('|')}]`, parseType, {type: 'login'})
     .option('-d, --device <device>', 'name or index of device to query (all devices are queried by default)', parseDevice)
     .description("Remotely request a secret from a paired device")
     .action( function(searchString) {
@@ -92,6 +92,7 @@ async function request(searchString, url, item, devices) {
 
         const secret = await requestSecret('wss://chat.outercorner.com/v1/', staticKeyPair, pns, devices, query)
         
+        console.log(JSON.stringify(secret))
 
     } catch(e) {
         console.log(chalk.red(e.stack))
