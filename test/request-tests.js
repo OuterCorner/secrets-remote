@@ -43,13 +43,23 @@ describe('Requesting secrets', function () {
                 const mockDevices = [
                     {
                         name: "Mocha Test",
-                        apnsToken: "bogusSuccessToken",
-                        publicKey: base64js.fromByteArray(this.clientStaticKeyPair.pub)
+                        publicKey: base64js.fromByteArray(this.clientStaticKeyPair.pub),
+                        channel: {
+                            type: 'apns',
+                            token: 'bogusSuccessToken',
+                            appId: 'com.outercorner.ios.Secrets',
+                            environment: 'dev'
+                        }
                     },
                     {
                         name: "Stale device",
-                        apnsToken: "bogusFailingToken",
-                        publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI="
+                        publicKey: "mFsKHijQ18LTyTlXUfk9uEqwcwD+07dwn3rLoQDKaWI=",
+                        channel: {
+                            type: 'apns',
+                            token: 'bogusFailingToken',
+                            appId: 'com.outercorner.ios.Secrets',
+                            environment: 'dev'
+                        }
                     }
                 ]
                 const mockQuery = { searchString: "survs", url: new URL("https://survs.com/app"), item: { types: ["login"], attributes: ["username", "password"] } }

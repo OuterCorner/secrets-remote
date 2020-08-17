@@ -68,14 +68,19 @@ describe('Pairing devices', function () {
                     type: 'pair',
                     role: 'request',
                     device_name: 'Remote App',
-                    apns_token: '740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad'
+                    channel: {
+                        type: 'apns',
+                        token: '740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad',
+                        appId: 'com.outercorner.ios.Secrets',
+                        environment: 'dev'
+                    }   
                 })
 
                 
                 return pairingPromise.then(device => {
                     assert.isNotNull(device)
                     assert.equal(device.name, 'Remote App')
-                    assert.equal(device.apnsToken, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
+                    assert.equal(device.channel.token, "740f4707bebcf74f9b7c25d48e3358945f6aa01da5ddb387462c7eaf61bb78ad")
                     assert.equal(device.publicKey, base64js.fromByteArray(this.clientStaticKeyPair.pub))
                 })
             } catch (error) {

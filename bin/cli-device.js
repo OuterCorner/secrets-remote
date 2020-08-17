@@ -54,7 +54,7 @@ async function pair(smallQR, autoAcceptName) {
             clear()
             qrcode.generate(pairingUrl, {small: smallQR})
             console.log(pairingUrl)
-            console.log("To pair with this machine, use your device's camera to read the QR Code above.")
+            console.log("To pair with this machine, use your device's camera to scan the QR Code above.")
             return os.hostname().split(".")[0]
         })
     
