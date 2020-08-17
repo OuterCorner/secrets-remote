@@ -33,7 +33,7 @@
     "data-store": "^4.0.3",
     "inquirer": "^7.0.3",
     "isomorphic-ws": "^4.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "noise-c.wasm": "^0.4.0",
     "qrcode-terminal": "^0.12.0",
     "secure-random": "^1.1.2",
