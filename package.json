@@ -1,6 +1,6 @@
 {
   "name": "@outercorner/secrets-remote",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A command line utility to remotely request secrets such as passwords, credit card numbers, one-time tokens, etc from Secrets.app",
   "main": "lib/index.js",
   "scripts": {
