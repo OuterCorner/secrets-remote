@@ -37,13 +37,17 @@ Use ```secrets device --help``` to lear how to manage your paired devices.
 
 The simplest form to request a secret is:
 
-```secrets request github```
+```
+secrets request github
+```
 
 This simply requests a secret for a given search string ("github") in this case.
 
 But it can be much more specific.
 
-```secrets request github -u https://github.com -t login:otp -d "Paulo's iPhone"```
+```
+secrets request github -u https://github.com -t login:otp -d "Paulo's iPhone"
+```
 
 The above command specifically requests the one-time password for the github login and from the "Paulo's iPhone" device. Passing the `-u` option allows Secret to validate that the item return is in fact associated with that URL.
 
