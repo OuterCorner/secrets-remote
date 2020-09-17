@@ -172,9 +172,9 @@ describe('Requesting secrets', function () {
                     }
                 })
 
-                return resultPromise.then(item => {
-                    assert.equal(item.username, "John Doe")
-                    assert.equal(item.password, "123456")
+                return resultPromise.then(result => {
+                    assert.equal(result.secret.username, "John Doe")
+                    assert.equal(result.secret.password, "123456")
                 })
             } catch (error) {
                 console.error(error)

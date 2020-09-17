@@ -90,7 +90,7 @@ async function request(searchString, url, item, devices) {
             console.error(chalk.red("✕") + ` Failed to notify device "${error.device.name}": ${error}`)
         })
 
-        const secret = await requestSecret('wss://chat.outercorner.com/v1/', staticKeyPair, pns, devices, query)
+        const { secret } = await requestSecret('wss://chat.outercorner.com/v1/', staticKeyPair, pns, devices, query)
         
         console.log(JSON.stringify(secret))
 
