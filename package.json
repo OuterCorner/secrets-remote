@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "A command line utility to remotely request secrets such as passwords, credit card numbers, one-time tokens, etc from Secrets.app",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/OuterCorner/secrets-remote"
+    "type": "git",
+    "url": "https://github.com/OuterCorner/secrets-remote"
   },
   "main": "lib/index.js",
   "scripts": {
