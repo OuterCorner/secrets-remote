@@ -6,7 +6,7 @@ const program = require('commander');
 const inquirer = require('inquirer');
 const os = require('os')
 const { pairDevice } = require('../lib')
-const { getStaticKeyPair, store, tabularDeviceData } = require('./cli-common')
+const { getStaticKeyPair, store, tabularDeviceData, defaultChatServerAddr } = require('./cli-common')
 
 
 program.name("secrets device")
@@ -22,9 +22,10 @@ program
     .command('pair')
     .option('-Q, --large-qrcode', 'use a large QR Code', false)
     .option('-y, --accept-name', 'automatically accept suggested device name')
+    .option('-c, --chat-server <url>', 'use a different chat server than the default (mainly used for testing)')
     .description("pair a new device")
     .action( function(cmdObj) {
-        pair(!cmdObj.largeQrcode, cmdObj.acceptName)
+        pair(cmdObj.chatServer || defaultChatServerAddr, !cmdObj.largeQrcode, cmdObj.acceptName)
     })
 
 // list command
@@ -46,10 +47,10 @@ program.parse(process.argv)
 
 
 
-async function pair(smallQR, autoAcceptName) {
+async function pair(charServiceAddr, smallQR, autoAcceptName) {
     try {
         const staticKeyPair = await getStaticKeyPair()
-        const device = await pairDevice('wss://chat.outercorner.com/v1/', staticKeyPair, (pairingInfo) => {
+        const device = await pairDevice(charServiceAddr, staticKeyPair, (pairingInfo) => {
             const pairingUrl = pairingInfo.url.href
             clear()
             qrcode.generate(pairingUrl, {small: smallQR})

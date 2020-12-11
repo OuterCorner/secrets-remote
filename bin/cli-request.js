@@ -4,12 +4,11 @@ const chalk = require('chalk')
 const clear = require('clear')
 const qrcode = require('qrcode-terminal')
 const { requestSecret, PushNotificationService, requestAdHocSecret } = require('../lib')
-const { getStaticKeyPair, store } = require('./cli-common')
+const { getStaticKeyPair, store, defaultChatServerAddr } = require('./cli-common')
 const pushService = require('superagent-use')(require('superagent'))
 const superagent_prefix = require('superagent-prefix')
 pushService.use(superagent_prefix('https://api.outercorner.com/secrets'))
 const validTypes = ['login','creditcard','bankaccount','note','softwarelicense']
-
 
 program
     .name("secrets request")
@@ -23,6 +22,7 @@ program
     .option('-d, --device <device>', 'name or index of device to query (all devices are queried by default)', parseDevice)
     .option('-a, --adhoc', 'perform an adhoc request, if set \'-d\' is ignored')
     .option('-Q, --large-qrcode', 'use a large QR Code (only applicable on ad hoc requests)', false)
+    .option('-c, --chat-server <url>', 'use a different chat server than the default (mainly used for testing)')
     .description("Remotely request a secret from a paired device")
     .action( function(searchString) {
         var opts = {}
@@ -38,6 +38,7 @@ program
             }
             opts.devices = devices
         }
+        opts.chatServer = this.chatServer || defaultChatServerAddr
         request(searchString, opts)
     })
 
@@ -98,7 +99,7 @@ async function request(searchString, options) {
     let largeQrCode = options.largeQrCode || false
 
     try {
-        const charServiceAddr = 'wss://chat.outercorner.com/v1/'
+        const charServiceAddr = options.chatServer
         const staticKeyPair = await getStaticKeyPair()
 
         const query = { searchString, url, item }

@@ -5,8 +5,9 @@ const store = require('data-store')({home: path.join(os.homedir(),'.outercorner'
 const chalk = require("chalk");
 const chalkTable = require("chalk-table");
 const _ = require('lodash')
-
 const { getNoiseLib } = require('../lib')
+
+const defaultChatServerAddr = 'wss://chat.outercorner.com/v1/'
 
 async function getStaticKeyPair(){
     function convert(keyPair, mappingFunction){
@@ -54,4 +55,4 @@ function tabularDeviceData(origDevices, numbered = false, highlightedDevice) {
     return chalkTable(options, devices)
 }
 
-module.exports = { getStaticKeyPair, store, tabularDeviceData }
+module.exports = { getStaticKeyPair, store, tabularDeviceData,  defaultChatServerAddr}
