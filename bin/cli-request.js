@@ -78,8 +78,8 @@ function parseDevice(deviceArg, selectedDevices = []) {
     });
     if (!device) {
         const index = parseInt(deviceArg)
-        if (!isNaN(index) && (index >= 0 && index < devices.length)) {
-            device = devices[index]
+        if (!isNaN(index) && (index > 0 && index <= devices.length)) {
+            device = devices[index-1]
         }
     }
     if (!device) {
