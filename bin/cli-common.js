@@ -7,7 +7,7 @@ const chalkTable = require("chalk-table");
 const _ = require('lodash')
 const { getNoiseLib } = require('../lib')
 
-const defaultChatServerAddr = 'wss://chat.outercorner.com/v1/'
+const defaultChatServerAddr = 'wss://chat.ms.outercorner.com/v1/'
 
 async function getStaticKeyPair(){
     function convert(keyPair, mappingFunction){

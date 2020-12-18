@@ -7,7 +7,7 @@ const { requestSecret, PushNotificationService, requestAdHocSecret } = require('
 const { getStaticKeyPair, store, defaultChatServerAddr } = require('./cli-common')
 const pushService = require('superagent-use')(require('superagent'))
 const superagent_prefix = require('superagent-prefix')
-pushService.use(superagent_prefix('https://api.outercorner.com/secrets'))
+pushService.use(superagent_prefix('https://push.ms.outercorner.com/v2/'))
 const validTypes = ['login','creditcard','bankaccount','note','softwarelicense']
 
 program
