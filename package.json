@@ -40,7 +40,6 @@
     "lodash": "^4.17.20",
     "noise-c.wasm": "^0.4.0",
     "qrcode-terminal": "^0.12.0",
-    "secure-random": "^1.1.2",
     "superagent": "^5.2.1",
     "superagent-prefix": "0.0.2",
     "superagent-use": "^0.1.0",
