@@ -125,8 +125,8 @@ describe('Pairing devices', function () {
                         Promise.reject(new Error('Expected method to reject.'))
                     },
                     err => {
-                        console.log(err)
                         assert.instanceOf(err, Error)
+                        assert.equal(err.message, "NOISE_ERROR_MAC_FAILURE")
                     }
                 )
                 
