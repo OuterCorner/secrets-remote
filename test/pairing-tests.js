@@ -29,7 +29,7 @@ describe('Pairing devices', function () {
         this.chatServer.close(done)
     })
 
-    describe('#pairDevice()', function () {
+    describe('#pairDeviceSuccess()', function () {
         it('Should return device on successful pairing', async function () {
             try {
                 const serverAddr = `ws://localhost:${chatServerPort}`
@@ -90,7 +90,7 @@ describe('Pairing devices', function () {
         });
     });
 
-    describe('#pairDevice()', function () {
+    describe('#pairDeviceFailure()', function () {
         it('Should fail on incorrect psk', async function () {
             this.timeout(20000)
             try {

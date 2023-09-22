@@ -77,16 +77,8 @@ describe('Requesting secrets', function () {
                         body: {
                             "push_id": "7b7b3699-d4b6-42cf-a407-bbe8756f459f",
                             "results": {
-                                "bogusSuccessToken": {
-                                    "DeliveryStatus": "SUCCESSFUL",
-                                    "StatusCode": 200,
-                                    "StatusMessage": ""
-                                },
-                                "bogusFailingToken": {
-                                    "DeliveryStatus": "PERMANENT_FAILURE",
-                                    "StatusCode": 410,
-                                    "StatusMessage": "{\"errorMessage\":\"Unregistered or expired token\",\"channelType\":\"APNS_SANDBOX\",\"pushProviderStatusCode\":\"400\",\"pushProviderError\":\"BadDeviceToken\",\"pushProviderResponse\":\"{\\\"reason\\\":\\\"BadDeviceToken\\\"}\"}"
-                                }
+                                "bogusSuccessToken": "SUCCESSFUL",
+                                "bogusFailingToken": "PERMANENT_FAILURE",
                             }
                         }
                     }
