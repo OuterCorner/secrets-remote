@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const base64js = require('base64-js')
-const pushService = require('superagent');
-const mockPushService = require('superagent-mocker')(pushService);
+const fetchMock = require('fetch-mock').sandbox()
+const mockPushService = require('fetch-absolute')(fetchMock)('https://push.example.com')
 const startMockChatServer = require('./mock-chat-server')
 const { requestSecret, NoiseSession, ChatClient, PeerMessenger, PushNotificationService, getNoiseLib } = require('../lib')
 const { wait } = require('../lib/util')
@@ -65,14 +65,16 @@ describe('Requesting secrets', function () {
                 const mockQuery = { searchString: "survs", url: new URL("https://survs.com/app"), item: { types: ["login"], attributes: ["username", "password"] } }
 
                 var peerId = undefined
-                const pushRequestExpectation = expectation((request) => {
-                    assert.equal(request.body.devices.length, 2)
-                    peerId = request.body.payload.peer_id
+                const pushRequestExpectation = expectation((reqOpts) => {
+                    const requestBody = JSON.parse(reqOpts.body)
+                    assert.equal(requestBody.devices.length, 2)
+                    peerId = requestBody.payload.peer_id
                     assert.exists(peerId)
-                    assert.equal(request.body.payload.public_key, base64js.fromByteArray(this.serverStaticKeyPair.pub))
+                    assert.equal(requestBody.payload.public_key, base64js.fromByteArray(this.serverStaticKeyPair.pub))
                 })
-                mockPushService.post("/push", (req) => {
-                    pushRequestExpectation.fulfill(req)
+
+                fetchMock.post("path:/push", (url, reqOpts) => {
+                    pushRequestExpectation.fulfill(reqOpts)
                     return {
                         body: {
                             "push_id": "7b7b3699-d4b6-42cf-a407-bbe8756f459f",
@@ -83,15 +85,16 @@ describe('Requesting secrets', function () {
                         }
                     }
                 })
-                
-                const pushDelRequestExpectation = expectation((request) => {
+
+                const pushDelRequestExpectation = expectation((reqOpts) => {
+                    const requestBody = JSON.parse(reqOpts.body)
                     // assert all devices are notified
-                    assert.equal(request.body.devices.count, 1)
-                    assert.equal(request.body.devices[0].token, mockDevices[0].apnsToken)
+                    assert.equal(requestBody.devices.length, 1)
+                    assert.equal(requestBody.devices[0].token, mockDevices[0].channel.token)
                 })
 
-                mockPushService.del("/push", (req) => {
-                    pushDelRequestExpectation.fulfill(req)
+                fetchMock.delete("path:/push", (url, reqOpts) => {
+                    pushDelRequestExpectation.fulfill(reqOpts)
                     return {
                         body: {
                             "results": {
@@ -112,7 +115,7 @@ describe('Requesting secrets', function () {
                     assert.equal(device.name, "Stale device")
                 })
 
-                const notificationService = new PushNotificationService(pushService)
+                const notificationService = new PushNotificationService(mockPushService)
                 notificationService.once("pushed", (device) => {
                     successFullPushNotification.fulfill(device)
                 })
