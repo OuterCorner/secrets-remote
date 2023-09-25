@@ -1,6 +1,6 @@
 # secrets-remote
 
-Command line tool to request secrets (logins, credit cards, notes…) from iOS devices running [Secrets 3.4.0+](https://outercorner.com/secrets-ios/).
+Command line tool to request secrets (logins, credit cards, notes…) from iOS devices running [Secrets 3.4.0+](https://secrets.app/).
 
 Connections between this tool and the device are end-to-end encrypted.
 
