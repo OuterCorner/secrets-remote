@@ -35,7 +35,7 @@
     "clear": "^0.1.0",
     "commander": "^4.1.0",
     "cross-fetch": "^4.0.0",
-    "data-store": "github:pfandrade/data-store",
+    "data-store": "git+https://git@github.com/pfandrade/data-store.git",
     "fetch-absolute": "^1.0.0",
     "inquirer": "^7.0.3",
     "isomorphic-ws": "^4.0.1",
